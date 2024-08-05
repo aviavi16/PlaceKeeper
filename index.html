@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Keeper</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body onload="onInit()">
+    <script>
+            function showHomePage() {
+                document.getElementById("home-section").style.display = "block";
+                document.getElementById("user-pref-section").style.display = "none";
+                document.getElementById("map-section").style.display = "none";
+            }
+
+            function showUserPrefPage() {
+                document.getElementById("home-section").style.display = "none";
+                document.getElementById("user-pref-section").style.display = "block";
+                document.getElementById("map-section").style.display = "none";
+            }
+                
+            function showMapPage() {
+                document.getElementById("home-section").style.display = "none";
+                document.getElementById("user-pref-section").style.display = "none";
+                document.getElementById("map-section").style.display = "block";
+            }                                
+      </script>
+    <nav class="topnav">
+        <ul>
+            <li class="nav-item"><a href="#" class="nav-link" onclick="showHomePage()">Home</a< /li>
+            <li class="nav-item"><a href="#" class="nav-link" onclick="showUserPrefPage()">User-preferance</a></li>
+            <li class="nav-item"><a href="#" class="nav-link" onclick="showMapPage()">Map</a></li>
+        </ul>
+    </nav>
+
+    
+    <section class=”home” id="home-section"> <!--the App’s home page with navigation buttons to the show the other sections. -->
+        <main>
+            <h1>Home Page</h1>            
+        </main>
+        
+    </section>
+    
+
+
+    <section class=”user-pref” id="user-pref-section"> <!-- displays a <form> for collecting user preferences. These preferences determine how various parts of the app are displayed. -->
+        <main>
+            <div>
+                <h4>user-pref</h4>
+            </div>
+        </main>
+    </section>
+
+    <section class=”map” id="map-section">   <!--displays a list of places saved by the user and a map.-->
+        <main>       
+            <div>
+                <h4>map</h4>
+                <div class="map" style="width: 100%; height: 400px;"></div><br/><br/>
+                    <button onclick="onGetUserPos()" class="btn-user-pos">Get User Position</button>
+                    <button onclick="onPanTo(35.6895, 139.6917)" class="btn-pan">Pan Map to Tokyo</button>
+                    <p>You are at: <span class="user-pos"></span></p>
+                </div>
+            <section class="actions">
+                <button title="Add Place" onclick="onAddPlace()">Add Place</button> <br/><br/>
+            </section>
+
+            <dialog class="modal">
+                <h3></h3>
+                <p></p>
+                <button onclick="onCloseModal()">Close</button>
+            </dialog>
+
+            <dialog class="update">
+                <form onsubmit="onSavePlace()" method="dialog" id="name-form">
+                    <h2>Add Place</h2>
+                    <input class="name-input" type="text" placeholder="Enter Place Name">       
+                    <input class="lat-input" type="text" placeholder="Enter Place Lat"> 
+                    <input class="lng-input" type="text" placeholder="Enter Place Lang">        
+                    <div class="actions">
+                        <button type="button" onclick="onClosePlaceEdit()">Cancel</button>
+                        <button>Save</button>
+                    </div>
+                </form>
+            </dialog>
+
+            <section class="places-container"> </section>
+            <div class="user-msg"></div>
+        </main>
+    </section>
+
+    
+    
+    <script src="js/services/util.service.js"></script>
+    <script src="js/services/user.service.js"></script>
+    <script src="js/services/place.service.js"></script>
+    <script src="js/app.controller.js"></script>
+</body>
+
+</html>

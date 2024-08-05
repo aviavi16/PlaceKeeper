@@ -1,0 +1,32 @@
+#user-pref-section, #map-section {
+    display: none;
+}
+body{
+    margin: 0px;
+}
+main{
+    margin-left: 20px;
+    margin-right: 20px;
+}
+h1{
+    text-align: center;
+}
+.topnav ul{
+    list-style-type: none;
+    overflow: hidden;
+    background-color: grey;
+    padding: 0px;
+    margin: 0px;
+}
+.topnav a{
+    color: white;
+    text-decoration: none;
+    padding: 15px;
+    display: block;
+}
+.topnav a:hover{
+    background-color: rgb(65, 64, 64);
+}
+.topnav li{
+    float: left;
+}
