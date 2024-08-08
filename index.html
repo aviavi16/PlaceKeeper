@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="./css/style.css">
 </head>
 
-<body onload="onInit()">
+<body onload="app.onInit()">
     <script>
             function showHomePage() {
                 document.getElementById("home-section").style.display = "block";
@@ -39,7 +39,9 @@
     
     <section class=”home” id="home-section"> <!--the App’s home page with navigation buttons to the show the other sections. -->
         <main>
-            <h1>Home Page</h1>            
+            <h1>Home Page</h1>    
+            <p>Hello and welcome to the place keeper app!</p>>  
+            <p> please use the above buttons to navigate to the map page (the other one is not done yet)</p>      
         </main>
         
     </section>
@@ -56,47 +58,39 @@
 
     <section class=”map” id="map-section">   <!--displays a list of places saved by the user and a map.-->
         <main>       
-            <div>
-                <h4>map</h4>
-                <div class="map" style="width: 100%; height: 400px;"></div><br/><br/>
-                    <button onclick="onGetUserPos()" class="btn-user-pos">Get User Position</button>
-                    <button onclick="onPanTo(35.6895, 139.6917)" class="btn-pan">Pan Map to Tokyo</button>
-                    <p>You are at: <span class="user-pos"></span></p>
-                </div>
-            <section class="actions">
-                <button title="Add Place" onclick="onAddPlace()">Add Place</button> <br/><br/>
-            </section>
+            <div id="map-container">
+                <div class="map" style="width: 100%;"></div><br/><br/>
 
-            <dialog class="modal">
-                <h3></h3>
-                <p></p>
-                <button onclick="onCloseModal()">Close</button>
-            </dialog>
+                <dialog class="modal">
+                    <h3></h3>
+                    <p></p>
+                    <button onclick="app.onCloseModal()">Close</button>
+                </dialog>
+    
+                <dialog class="update">
+                    <form onsubmit="app.onSavePlace()" method="dialog" id="name-form">
+                        <h2>Add Place</h2>
+                        <input class="name-input" type="text" placeholder="Enter Place Name">       
+                        <input class="lat-input" type="text" placeholder="Enter Place Lat"> 
+                        <input class="lng-input" type="text" placeholder="Enter Place Lang">        
+                        <div class="actions">
+                            <button type="button" onclick="app.onClosePlace()">Cancel</button>
+                            <button>Save</button>
+                        </div>
+                    </form>
+                </dialog>
 
-            <dialog class="update">
-                <form onsubmit="onSavePlace()" method="dialog" id="name-form">
-                    <h2>Add Place</h2>
-                    <input class="name-input" type="text" placeholder="Enter Place Name">       
-                    <input class="lat-input" type="text" placeholder="Enter Place Lat"> 
-                    <input class="lng-input" type="text" placeholder="Enter Place Lang">        
-                    <div class="actions">
-                        <button type="button" onclick="onClosePlaceEdit()">Cancel</button>
-                        <button>Save</button>
-                    </div>
-                </form>
-            </dialog>
+                <section class="places-container"> 
+                    
+                </section>
+            </div>
 
-            <section class="places-container"> </section>
+            
             <div class="user-msg"></div>
         </main>
     </section>
 
-    
-    
-    <script src="js/services/util.service.js"></script>
-    <script src="js/services/user.service.js"></script>
-    <script src="js/services/place.service.js"></script>
-    <script src="js/app.controller.js"></script>
+    <script type="module" src="js/app.controller.js"></script>
 </body>
 
 </html>

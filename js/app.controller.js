@@ -1,5 +1,27 @@
+import { storageService } from "./services/async-storage.service.js"
+import { placeService } from "./services/place.service.js"
 
-"use strict";
+window.app={
+    onInit,
+    initMap,
+    renderPlaces,
+    onRemovePlace,
+    onAddPlace,
+    onUpdatePlace,
+    onSavePlace,
+    onCloseModal,
+    onReadPlace,
+    onClosePlace,
+    onSetFilterBy,
+    onSetSortBy,
+    flashMsg,
+    onPanTo,
+    onGetUserPos,
+    onPanToPlace,
+    renderMarkers,
+    initRenderMarkers
+}
+
 window.onload = onInit
 window.onPanTo = onPanTo
 window.onGetUserPos = onGetUserPos
@@ -41,7 +63,7 @@ function initMap(lat = 29.550360, lng = 34.952278) {
                 const name = prompt('Place name?', 'Place 1') 
                 const lat = ev.latLng.lat() 
                 const lng = ev.latLng.lng() 
-                await addPlace(name, lat, lng, gMap.getZoom()) 
+                await placeService.addPlace(name, lat, lng, gMap.getZoom()) 
                 renderPlaces() 
                 renderMarkers()
             })
@@ -50,37 +72,57 @@ function initMap(lat = 29.550360, lng = 34.952278) {
 }
 
 function renderPlaces() {
-    var places = getPlaces(gQueryOptions)
-    console.log('places:', places)
-    var strHtmls = places.map(
-        place => `<article class="place-preview"> 
-            <h2> ${place.name}</h2>
-            <button title="Delete Place" class="btn-remove" onclick="onRemovePlace('${place.Id}')">Delete Place</button><br/><br/>
-            
-            <button onclick="onPanToPlace('${place.Id}')">Go To ${place.name}</button><br/><br/>
-            <button onclick="onReadPlace('${place.Id}')">Details</button>
-            <button onclick="onUpdatePlace('${place.Id}')">Update</button>
+    var places = placeService.getPlaces(gQueryOptions)
+        .then(places =>{
+            console.log('places:', places)
+            var strHtmls = places.map(
+                place => `                  
+                    <div class="button-container1"  style=" font-family: 'Poppins'; color: #fff !important;text-transform: uppercase;font-weight: 700;text-decoration: none;background: #60a3bc;padding-bottom: 20px;border-radius: 50px;display: inline-block;border: dashed;transition: all 0.4s ease 0s;">
+                        <center><h2 style="color: black"> ${place.name}</h2></center>     
+                        <center><button onclick="app.onReadPlace('${place.Id}')" style="background-color: green;color: white;">Details</button>
+                        <button onclick="app.onUpdatePlace('${place.Id}')" style="background-color: darkgoldenrod;color: white;">Update</button></center>
+                    </div><br/>   
+                    <div class="button-container2" >
+                        <center><button onclick="app.onPanToPlace('${place.Id}')"  style="background-color: blue; border: none; border-radius: 5px; font-weight: bold; font-size: 12px; font-family: &quot;Courier New&quot;, Courier, monospace; color: white; padding: 5px;  text-align: center; cursor: pointer;" >Go To: ${place.name}</button>
+                        <button title="Delete Place" class="btn-remove" onclick="app.onRemovePlace('${place.Id}')" style="background-color: purple; border: none; border-radius: 5px; font-weight: bold; font-size: 12px; font-family: &quot;Courier New&quot;, Courier, monospace; color: white; padding: 5px;  text-align: center; cursor: pointer;" onmousedown="this.style.color='rgba(255, 255, 255, 0.4)';" onmouseover="this.style.backgroundColor= 'red'" onmouseleave="this.style.backgroundColor = 'purple'">Delete Place</button></center>
+                    </div>
+                    <br/><br/>
+                </ul>`     
+            )
+            strHtmls = `
+                <div class ="map continer2" style="margin-block-start: 20px;">
+                <center><img src="https://cdn-icons-png.flaticon.com/512/4312/4312243.png" heigth="3px" width="20px"></center>
+                <center><button onclick="app.onGetUserPos()" class="btn-user-pos"  style=" font-family: 'Poppins'; color: black ">  Get Location</button></center>
+                
+                <p id="myLoc" style="text-align: center;">You are at: <span class="user-pos" ></span></p><br/> 
+                ` + strHtmls + `</div>`
 
-
-        </article>`     
-    )
-    document.querySelector('.places-container').innerHTML = strHtmls
-    //document.querySelector('.places-container').innerHTML = "<span> test </span>".Join('')
+            document.querySelector('.places-container').innerHTML = strHtmls
+        })
+        .catch(error =>{
+            console.log('error in rendering places function:', error)
+            alert('error in rendering places function')
+        })
+    
 }
 
 // CRUD
 
 function onRemovePlace(placeId){
-    removePlace(placeId)
-    renderPlaces()
-    renderMarkers()
-    flashMsg('Place Deleted')
+    placeService.removePlace(placeId)
+        .then(()=>{
+            renderPlaces()
+            renderMarkers()
+            flashMsg('Place Deleted')
+        })
+        .catch(error =>{
+            console.log('error in removing place:' + placeId + 'error: ', error)
+        })
 }
+    
 
 function onAddPlace(){
-    resetName()
-
-	const elModal = document.querySelector('.place-name')
+	const elModal = document.querySelector('.update')
 	elModal.showModal()
 }
 
@@ -91,40 +133,45 @@ function onUpdatePlace(placeId) {
     const elLat = document.querySelector('.lat-input')
     const elLng = document.querySelector('.lng-input')
 
+    placeService.getPlaceById(placeId)
+        .then(place =>{
+            gPlaceToEdit = place
 
-	var place = getPlaceById(placeId)
+            elName.value = gPlaceToEdit.name
+            elLat.value = gPlaceToEdit.lat
+            elLng.value = gPlaceToEdit.lng
+            elModal.showModal()
+        })
+        .catch(error =>{
+            console.log('error in onUpdatePlace function:', error)
+            alert( 'error updating place')
+        })
         
-    gPlaceToEdit = place
-
-    elName.value = gPlaceToEdit.name
-    elLat.value = gPlaceToEdit.lat
-    elLng.value = gPlaceToEdit.lng
-    elModal.showModal()
+    
         
 }
 
 function onSavePlace() {
 	const elForm = document.querySelector('.place-name form')
 
-	const elName = elForm.querySelector('select')
-
-	const name = elName.value
+	const name = document.querySelector('.name-input').value
+    const lat = Number(document.querySelector('.lat-input').value)
+    const lng = Number(document.querySelector('.lng-input').value)
 
 	if (gPlaceToEdit) {
-		var prmSavedPlace = updatePlace(gPlaceToEdit.Id, name, 32.1416, 34.831213,"bla bla blka")
+		var prmSavedPlace = placeService.updatePlace(gPlaceToEdit.Id, name, lat, lng, 15)
 		gPlaceToEdit = null
 	} else {
-		var prmSavedPlace = addPlace(gPlaceToEdit.Id,name, 32.1416, 34.831213,"bla bla blka")
+		var prmSavedPlace = placeService.addPlace( name, lat, lng, 15)
 	}
 
-    prmSavedPlace
-        .then(savedPlace=> {
-            elForm.reset()
-        
-            renderPlaces()
-            renderMarkers()
-            flashMsg(`Place Saved (id: ${savedPlace.Id})`)
-        })
+    prmSavedPlace.then(savedPlace =>{
+        renderPlaces()
+        renderMarkers()
+        flashMsg(`Place Saved (id: ${savedPlace.Id})`)
+    
+    })
+   
 }
 
 // Place Edit Dialog
@@ -133,22 +180,27 @@ function onCloseModal() {
 	document.querySelector('.modal').close()
 }
 
-function resetName() {
-	const elForm = document.querySelector('.place-name form')
-	elForm.reset()
-}
-
 // Details Name
 
 function onReadPlace(placeId) {
-	var place = getPlaceById(placeId)
-    const elName = document.querySelector('.modal')
-    elName.querySelector('h3').innerText = place.name        
-    elName.showModal()       
+	placeService.getPlaceById(placeId)
+        .then(place => {
+            const elName = document.querySelector('.modal')
+            elName.querySelector('h3').innerText = place.name  
+           // elName.querySelector('h5').innerText = place.lat   
+            //elName.querySelector('h5').innerText = place.lng     
+            elName.showModal()    
+        })
+        .catch(error =>{
+            console.log('error in onReadPlace function:', error)
+            alert('error finding place')
+        })
+
+       
 }
 
 function onClosePlace() {
-	document.querySelector('.modal').close()
+	document.querySelector('.update').close()
 }
 
 
@@ -251,6 +303,8 @@ async function onGetUserPos() {
         console.log('User position is:', pos.coords)
         document.querySelector('.user-pos').innerText = `Latitude: ${pos.coords.latitude} - Longitude: ${pos.coords.longitude}`
         onPanTo(pos.coords.latitude, pos.coords.longitude)
+        document.getElementById('myLoc').style.display = "block"
+
     } catch (err) {
         console.log('err!!!', err)
     }
@@ -258,7 +312,9 @@ async function onGetUserPos() {
 
 function _connectGoogleApi() {
     if (window.google) return Promise.resolve()
-    const API_KEY = process.env.API_KEY
+        // TODO: Enter your API Key
+    const API_KEY = 'AIzaSyCaQVlcIeYewnFSmm3xkL2d3HHy9xhYbz4'
+
 
     const elGoogleApi = document.createElement('script')
     elGoogleApi.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}`
@@ -272,13 +328,13 @@ function _connectGoogleApi() {
 }
 
 async function onPanToPlace(placeId) { 
-    const place = await getPlaceById(placeId) 
+    const place = await placeService.getPlaceById(placeId) 
     gMap.setCenter({ lat: place.lat, lng: place.lng}) 
     gMap.setZoom(place.zoom) 
 }
 
 async function renderMarkers() { 
-    const places = await getPlaces() 
+    const places = await placeService.getPlaces() 
     // remove previous markers 
     gMarkers.forEach(marker => marker.setMap(null)) 
     // every place is creating a marker 
@@ -288,7 +344,7 @@ async function renderMarkers() {
 }
 
 async function initRenderMarkers() { 
-    const places = await getPlaces() 
+    const places = await placeService.getPlaces() 
     // every place is creating a marker 
     gMarkers = places.map(place => { 
         return new google.maps.Marker({ position: place, map: gMap, title: place.name }) 

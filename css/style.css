@@ -1,4 +1,19 @@
-#user-pref-section, #map-section {
+body{
+    background-color: rgb(102, 146, 35);
+}
+#map-container{
+    display: flex;
+    justify-content: space-between;
+    height: 90vh;
+    COLUMN-GAP: 1EM;
+    margin-top: 25px;
+    background-color: inherit;
+}
+.map{
+    display: flex;
+    flex-direction: column;
+}
+#myLoc, #user-pref-section, #map-section {
     display: none;
 }
 body{
@@ -7,6 +22,7 @@ body{
 main{
     margin-left: 20px;
     margin-right: 20px;
+    padding: 10px;
 }
 h1{
     text-align: center;
@@ -29,4 +45,26 @@ h1{
 }
 .topnav li{
     float: left;
+}
+.places-container{
+    overflow: hidden;
+    width: 35vh;
+    background-color: lightblue;
+    font-family: Gill Sans, Verdana;
+    font-size: 11px;
+    line-height: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+    overflow-y:auto;
+}
+#home-sction,  #user-pref-section{
+    display: block;
+    background-color: darkkhaki;
+    font-size: 11px;
+    line-height: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+    text-align: center;
 }
